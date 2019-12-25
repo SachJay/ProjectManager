@@ -6,30 +6,11 @@ var Tasks = ({task="Undefined"}) => (
   <h1>{task}</h1>
 );
 
-var SprintColumn = ({title="To Do", tasks=[]}) => (
-  <div className="item col-md-3">
-    <div className="col-md-12 bg-danger pb-1 rounded-lg">
-      <h1 className="text-center pb-4">{title}</h1>
-      {
-        tasks.map((task) =>
-          <SprintRow title={task.title}/>
-        )
-      }
-      <AddPanel></AddPanel>
-      <AddButton></AddButton>
-    </div>
-  </div>
-);
-
 var SprintRow = ({title="Interface", desc="Unwilling sportsmen he in questions september therefore described so. Attacks may set few believe moments was. Reasonably how possession shy way introduced age inquietude."}) => (
   <div className="col-12 bg-warning mb-4 rounded-lg pb-3 pt-2">
     <h4 className="text-center">{title}</h4>
      {desc}
   </div>
-);
-
-var AddButton = () => (
-  <button className="col-md-12 bg-warning pb-1 rounded-lg border-0 text-white mb-4">Add New Task</button>
 );
 
 var AddPanel = () => (
@@ -48,11 +29,17 @@ var AddPanel = () => (
   </div>
 );
 
+class Tracker {
+  constructor(){
+    this.state = {
+      isAddingTask:false
+    }
+  }
+}
+
 class App extends Component {
   constructor(){
     super();
-
-    var nextId = 0;
 
     this.textInputTitle = React.createRef();
     this.textInputInfo = React.createRef();
@@ -61,12 +48,35 @@ class App extends Component {
       open: false,
       isUpdated: true,
       isFetching: false,
+      choosenCol: 0,
       toDoTasks: [{"title": "Backend"},{"title": "Database"}],
       doingTasks: [{"title": "Interface"}],
       reviewTasks: [{"title": "Design"}],
       doneTasks: []
     };
   }
+
+  sprintColumn = (title="To Do", tasks=[], id=0) => (
+    <div className="item col-md-3">
+      <div className="col-md-12 bg-danger pb-1 rounded-lg">
+        <h1 className="text-center pb-4">{title}</h1>
+        {
+          tasks.map((task) =>
+            <SprintRow title={task.title}/>
+          )
+        }
+        {this.state.choosenCol == id ? <AddPanel></AddPanel> : this.addButtonPanel(id)}
+      </div>
+    </div>
+  )
+
+  updateChoosenCol = (id) => {
+      this.setState({choosenCol: id});
+  }
+
+  addButtonPanel = (id) => (
+    <button className="col-md-12 bg-warning pb-1 rounded-lg border-0 text-white mb-4" onClick={() => this.updateChoosenCol(id)}>Add New Task</button>
+  );
 
   renderTasks = () => {
     return (
@@ -113,7 +123,10 @@ class App extends Component {
       this.setState({isUpdated: true});
     });
   }*/
-
+/* <SprintColumn title="To Do" tasks={this.state.toDoTasks}></SprintColumn>
+          <SprintColumn title="Doing" tasks={this.state.doingTasks}></SprintColumn>
+          <SprintColumn title="Review" tasks={this.state.reviewTasks}></SprintColumn>
+          <SprintColumn title="Done" tasks={this.state.doneTasks}></SprintColumn> */
   render(){
     
 
@@ -122,10 +135,10 @@ class App extends Component {
         <h2>This Bug Tracker is {this.state.open ? 'Online' : 'Offline'}</h2>
 
         <div className="row">
-          <SprintColumn title="To Do" tasks={this.state.toDoTasks}></SprintColumn>
-          <SprintColumn title="Doing" tasks={this.state.doingTasks}></SprintColumn>
-          <SprintColumn title="Review" tasks={this.state.reviewTasks}></SprintColumn>
-          <SprintColumn title="Done" tasks={this.state.doneTasks}></SprintColumn>
+          {this.sprintColumn("To Do", this.state.toDoTasks, 0)}
+          {this.sprintColumn("Doing", this.state.doingTasks, 1)}
+          {this.sprintColumn("Review", this.state.reviewTasks, 2)}
+          {this.sprintColumn("Done", this.state.doneTasks, 3)}
         </div>
           
         <input ref={this.textInputTitle}></input>
