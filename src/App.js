@@ -13,29 +13,15 @@ var SprintRow = ({title="Interface", desc="Unwilling sportsmen he in questions s
   </div>
 );
 
-var AddPanel = () => (
-  <div className=" bg-warning rounded-lg mb-4 py-3 ">
-    <div className=" col-12 input-group-sm">
-      <textarea rows="1" className="mb-3 form-control" placeholder="Title" type="text"></textarea>
-    
-      <textarea rows="3" className="mb-3 form-control" placeholder="Description" type="text"></textarea>
-    </div>
 
-    <div className="col-12">
-      <button className="col-12 bg-info pb-1 rounded-lg border-0 text-white mb-2">Add Task</button>
-    </div>
-    
+var SprintRowTitle = ({title="Interface"}) => (
 
-  </div>
+    <div className="col-12 bg-warning mb-4 rounded-lg py-1 text-center">
+      {title}
+    </div>
 );
 
-class Tracker {
-  constructor(){
-    this.state = {
-      isAddingTask:false
-    }
-  }
-}
+
 
 class App extends Component {
   constructor(){
@@ -49,26 +35,13 @@ class App extends Component {
       isUpdated: true,
       isFetching: false,
       choosenCol: 0,
-      toDoTasks: [{"title": "Backend"},{"title": "Database"}],
-      doingTasks: [{"title": "Interface"}],
-      reviewTasks: [{"title": "Design"}],
-      doneTasks: []
+      dataBase: [{"title": "Backend", "column" : 1},{"title": "Database", "column" : 2},{"title": "Design", "column" : 3},{"title": "Interface", "column" : 1},{"title": "Interface", "column" : 0}]
     };
   }
 
-  sprintColumn = (title="To Do", tasks=[], id=0) => (
-    <div className="item col-md-3">
-      <div className="col-md-12 bg-danger pb-1 rounded-lg">
-        <h1 className="text-center pb-4">{title}</h1>
-        {
-          tasks.map((task) =>
-            <SprintRow title={task.title}/>
-          )
-        }
-        {this.state.choosenCol == id ? <AddPanel></AddPanel> : this.addButtonPanel(id)}
-      </div>
-    </div>
-  )
+  checkCol = (task, id) => {
+   
+  }
 
   updateChoosenCol = (id) => {
       this.setState({choosenCol: id});
@@ -81,7 +54,7 @@ class App extends Component {
   renderTasks = () => {
     return (
       <ul>
-        {this.state.toDoTasks.map((task, id) =>
+        {this.state.dataBase.map((task, id) =>
           <li key={id}>
             <Tasks task={task.title}/>
           </li>
@@ -123,10 +96,80 @@ class App extends Component {
       this.setState({isUpdated: true});
     });
   }*/
-/* <SprintColumn title="To Do" tasks={this.state.toDoTasks}></SprintColumn>
-          <SprintColumn title="Doing" tasks={this.state.doingTasks}></SprintColumn>
-          <SprintColumn title="Review" tasks={this.state.reviewTasks}></SprintColumn>
-          <SprintColumn title="Done" tasks={this.state.doneTasks}></SprintColumn> */
+
+  addPanel = () => (
+    <div className=" bg-warning rounded-lg mb-4 py-3 ">
+      <div className=" col-12 input-group-sm">
+        <textarea rows="1" className="mb-3 form-control" placeholder="Title" type="text"></textarea>
+      
+        <textarea rows="3" className="mb-3 form-control" placeholder="Description" type="text"></textarea>
+      </div>
+  
+      <div className="col-12">
+        <button className="col-12 bg-info pb-1 rounded-lg border-0 text-white mb-2">Add Task</button>
+      </div>
+      
+      <div className="col-12 text-center">
+        <button className="col-5 bg-info pb-1 rounded-lg border-0 text-white mb-2" onClick={() => this.updateChoosenCol(-1)}>Cancel</button>
+      </div>
+    </div>
+  );
+
+  backlogCondition = (task) => {
+    if(task.column == 0){
+      return (
+        <div className="col-4">
+          <SprintRowTitle title={task.title}/>
+        </div>
+      )
+    }
+  }
+
+  sprintCondition = (task) => {
+    if(task.column != 0){
+      return (
+        <div className="col-12">
+          <SprintRowTitle title={task.title}/>
+        </div>
+      )
+    }
+  }
+
+  sprintColumn = (title="To Do", id=0) => (
+    <div className="item col-md-3">
+      <div className="col-md-12 bg-danger pb-1 rounded-lg">
+        <h1 className="text-center pb-4">{title}</h1>
+        {
+          this.state.dataBase.map((task) => {
+            if(task.column == id){
+              return <SprintRow title={task.title}/>
+             }
+          })
+        }
+        {this.state.choosenCol == id ? this.addPanel() : this.addButtonPanel(id)}
+      </div>
+    </div>
+  )
+
+  column = (title, condition) => (
+
+    <div className="col-12 bg-danger rounded-lg">
+      <h1 className="text-center pb-4">{title}</h1>
+        
+        <div className="row">
+          {
+            this.state.dataBase.map((task) => { 
+              return condition(task);
+            })
+          }
+        </div>
+       
+    
+        {/*this.state.choosenCol == 0 ? this.addPanel() : this.addButtonPanel(0)*/}
+    </div>
+      
+  );
+
   render(){
     
 
@@ -135,10 +178,10 @@ class App extends Component {
         <h2>This Bug Tracker is {this.state.open ? 'Online' : 'Offline'}</h2>
 
         <div className="row">
-          {this.sprintColumn("To Do", this.state.toDoTasks, 0)}
-          {this.sprintColumn("Doing", this.state.doingTasks, 1)}
-          {this.sprintColumn("Review", this.state.reviewTasks, 2)}
-          {this.sprintColumn("Done", this.state.doneTasks, 3)}
+          {this.sprintColumn("To Do", 1)}
+          {this.sprintColumn("Doing", 2)}
+          {this.sprintColumn("Review", 3)}
+          {this.sprintColumn("Done", 4)}
         </div>
           
         <input ref={this.textInputTitle}></input>
@@ -148,7 +191,23 @@ class App extends Component {
         <button onClick={this.onButtonClick}>Submit</button>
 
         {this.state.isUpdated ? this.getData() : this.addTask()}
-      </div>
+
+
+       { /*Backlog*/ }
+
+          <div className="row col-12">
+            <div className="col-md-9 rounded-lg">
+              {this.column("Backlog", this.backlogCondition)}
+            </div>
+            
+            <div className="col-md-3 rounded-lg">
+              {this.column("Sprint", this.sprintCondition)}
+            </div>
+          </div>
+
+
+        </div>
+        
     )
   }
 }
