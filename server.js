@@ -9,11 +9,12 @@ app.use(express.static(path.join(__dirname, 'build')));
 app.use(bodyParser.json());
 
 var TaskNames = [
-    {task: "Interface"},
-    {task: "FrontEnd"},
-    {task: "BackEnd"},
-    {task: "Gay"},
-    {task: ""}
+  {"title": "Backlog Design", "column" : 1},
+  {"title": "Backend", "column" : 1},
+  {"title": "Database", "column" : 2},
+  {"title": "Design", "column" : 3},
+  {"title": "Interface", "column" : 1},
+  {"title": "Sprint Page", "column" : 0}
 ];
 
 app.get("/data", (req, res) => {
@@ -25,6 +26,8 @@ io.on('connection', (socket) => {
 })
 
 app.post("/data", (req, res) => {
+  console.log("Added");
+  
   io.emit('message', req.body);
   TaskNames.push(req.body);
   res.sendStatus(200);
